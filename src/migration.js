@@ -1,8 +1,10 @@
 // Step 1: Import MongoClient from the mongodb package
 const { MongoClient } = require('mongodb');
+require('dotenv').config(); // Load environment variables from .env file
 
-// Step 2: Load configuration (MongoDB and DocumentDB URIs)
-const config = require('./config.json');
+// Step 2: Use environment variables for MongoDB and DocumentDB URIs
+const mongoUri = process.env.MONGODB_URI;
+const docdbUri = process.env.DOCUMENTDB_URI;
 
 // Step 3: Define the collections to be migrated
 const collectionsToMigrate = ['AyuNxtDB']; // Add your collection names here
@@ -10,10 +12,10 @@ const collectionsToMigrate = ['AyuNxtDB']; // Add your collection names here
 // Step 4: Asynchronous function to migrate data between MongoDB and DocumentDB
 async function migrateData() {
   // Step 5: Create MongoDB client
-  const mongoClient = new MongoClient(config.mongodbUri);
+  const mongoClient = new MongoClient(mongoUri);
 
   // Step 6: Create DocumentDB client
-  const docDbClient = new MongoClient(config.documentdbUri);
+  const docDbClient = new MongoClient(docdbUri);
 
   try {
     // Step 7: Connect to MongoDB
@@ -35,11 +37,10 @@ async function migrateData() {
       // Step 11: Fetch all documents from MongoDB collection
       const mongoCollection = mongoDb.collection(collectionName);
       const data = await mongoCollection.find({}).toArray();  // Fetch all documents
-      
+
       // Step 12: Transform the data if necessary (optional)
       const transformedData = data.map(doc => {
         // Apply any transformation logic if necessary (e.g., renaming fields)
-        // Example: doc.newField = doc.oldField;
         return doc;
       });
 
@@ -52,7 +53,7 @@ async function migrateData() {
         console.log(`No documents to migrate in ${collectionName}`);
       }
     }
-    
+
     console.log("Data migration completed successfully!");
 
   } catch (err) {
